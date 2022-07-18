@@ -70,6 +70,11 @@ By default, Cloud9 manages temporary IAM credentials for you.  Unfortunately the
     aws sts get-caller-identity --query Arn | grep workshop-admin -q && echo "IAM role valid" || echo "IAM role NOT valid"
     ```
 
+#### Increase volume for the Cloud9 EC2 instance
+To be safe with further steps it is recommended to increase a default size of Cloud9 EC2 instance from 10GB to 20GB. It can be done using [this deep link to find your Cloud9 EC2 instance](https://console.aws.amazon.com/ec2/v2/home?#Instances:tag:Name=aws-cloud9-;sort=desc:launchTime).
+
+
+
 #### Upgrade awscli
 To ensure you are running the latest version of AWS CLI, run the following command:
 
@@ -88,21 +93,6 @@ Default region name [None]: us-east-1
 Default output format [None]: 
 ```
 
-#### Install Terraform
-
-Download and install Terraform:
-
-```bash
-sudo yum install -y yum-utils
-sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-sudo yum -y install terraform
-```
-
-Verify that you can run Terraform:
-
-```bash
-terraform version
-```
 
 #### Install Apache Maven
 
@@ -176,27 +166,6 @@ docker run -it --rm -p 8080:80  --name petclinic petclinic
 
 This will run the application using container port of 80 and will expose the application to host port of 8080. Click Preview from the top menu and then click “Preview Running Application.” It will open a browser displaying the Spring Petclinic application.
 
-## Push Petclinic docker image to Amazon ECR
-On your Cloud9 IDE open a new terminal and run the following inside the new terminal:
-
-```bash
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
-AWS_REGION=$(aws configure get region)
-
-export REPOSITORY_NAME=petclinic
-export IMAGE_NAME=petclinic
-
-aws ecr create-repository \
-    --repository-name $REPOSITORY_NAME \
-    --image-scanning-configuration scanOnPush=true \
-    --region $AWS_REGION
-	
-aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-
-docker tag $IMAGE_NAME $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME
-docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME
-
-```
 
 ## Build the infrastructure and pipeline
 
